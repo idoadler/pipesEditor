@@ -8,17 +8,20 @@ var selection = [0, 0]; //Which tile we will paint from the menu
 
 var isMouseDown = false;
 var currentLayer = 0;
-var layers = [
-    //Bottom
-    {
-        //Structure is "x-y": ["tileset_x", "tileset_y"]
-        //EXAMPLE: "1-1": [0, 4],
-    },
-    //Middle
-    {},
-    //Top
-    {}
-];
+var levelData = {
+    version:1,
+    tiles:[
+        //Bottom
+        {
+            //Structure is "x-y": ["tileset_x", "tileset_y"]
+            //EXAMPLE: "1-1": [0, 4],
+        },
+        //Middle
+        {},
+        //Top
+        {}
+    ]
+};
 
 //Select tile from the Tiles grid
 tilesetContainer.addEventListener("mousedown", (event) => {
@@ -33,9 +36,9 @@ function addTile(mouseEvent) {
     var key = clicked[0] + "-" + clicked[1];
 
     if (mouseEvent.shiftKey) {
-        delete layers[currentLayer][key];
+        delete levelData.tiles[currentLayer][key];
     } else {
-        layers[currentLayer][key] = [selection[0], selection[1]];
+        levelData.tiles[currentLayer][key] = [selection[0], selection[1]];
     }
     draw();
 }
@@ -77,7 +80,7 @@ function exportImage() {
 
 //Reset state to empty
 function clearCanvas() {
-    layers = [{}, {}, {}];
+    levelData.tiles = [{}, {}, {}];
     draw();
 }
 
@@ -99,7 +102,7 @@ function draw() {
 
     var size_of_crop = 32;
 
-    layers.forEach((layer) => {
+    levelData.tiles.forEach((layer) => {
         Object.keys(layer).forEach((key) => {
             //Determine x/y position of this placement from key ("3-4" -> x=3, y=4)
             var positionX = Number(key.split("-")[0]);
@@ -120,7 +123,7 @@ function draw() {
         });
     });
 
-    txtResult.value = JSON.stringify(layers[0])
+    txtResult.value = JSON.stringify(levelData)
 }
 
 //Default image for booting up -> Just looks nicer than loading empty canvas
@@ -128,7 +131,7 @@ var defaultState = [{"7-10":[0,1],"7-9":[2,1],"7-8":[2,1],"7-7":[2,1],"7-6":[2,1
 
 //Initialize app when tileset source is done loading
 tilesetImage.onload = function() {
-    layers = defaultState;
+    levelData.tiles = defaultState;
     draw();
     setLayer(0);
 }
