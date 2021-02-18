@@ -10,6 +10,9 @@ var isMouseDown = false;
 var currentLayer = 0;
 var levelData = {
     version:1,
+    boardSize:[canvas.width / 32, canvas.height / 32],
+    start:[2,3],
+    end:[0,0],
     tiles:[
         //Bottom
         {
