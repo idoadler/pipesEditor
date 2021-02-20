@@ -5,19 +5,26 @@
     <title>Pipe Editor</title>
     <link rel="stylesheet" type="text/css" href="style.css"/>
 </head>
-<body>
 <!--
 Watch the video tutorial:
 https://youtu.be/IYgZMIB7_PM
 -->
-
-
+<body>
     <div class="card">
-
         <header>
             <h1>Pipe Map Editor</h1>
             <div>
-                <button class="button-as-link" onclick="clearCanvas()">Clear Canvas</button>
+                <select name="chosenExample" id="chosenExample">
+                    <optgroup label="New levels">
+                        <option value="none">Empty</option>
+                    </optgroup>
+                    <optgroup label="Example levels">
+                        <option selected value="exm1">Example 1</option>
+                        <option value="exm2">Example 2</option>
+                        <option value="exm3">Example 3</option>
+                    </optgroup>
+                </select>
+                <button class="button-as-link" onclick="setCanvas()">Set Map</button>
                 <!-- <button class="primary-button" onclick="exportImage()">Export Image</button> -->
             </div>
         </header>
