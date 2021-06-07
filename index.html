@@ -37,21 +37,31 @@ https://youtu.be/IYgZMIB7_PM
             </aside>
             <div class="card_right-column">
                 <!-- The main canvas -->
-                <canvas width="480" height="480">
-                </canvas>
+                <div>
+                    <p>
+                        Map:
+                    </p>
+                    <canvas id="mapCanvas" width="480" height="480">
+                    </canvas>
+                </div>
+                <div>
+                    <p>
+                        Tiles pool:
+                    </p>
+                    <canvas id="poolCanvas" width="480" height="64">
+                    </canvas>
+                </div>
+                <div>
+                    <p>
+                        Starting tiles:
+                    </p>
+                    <canvas id="startCanvas" width="480" height="64">
+                    </canvas>
+                </div>
                 <p class="instructions">
                     <strong>Click</strong> to paint.
                     <strong>Shift+Click</strong> to remove.
                 </p>
-                <!-- UI for layers
-                <div>
-                    <label>Editing Layer:</label>
-                    <ul class="layers">
-                        <li><button onclick="setLayer(2)" class="layer" tile-layer="2">Top Layer</button></li>
-                        <li><button onclick="setLayer(1)" class="layer" tile-layer="1">Middle Layer</button></li>
-                        <li><button onclick="setLayer(0)" class="layer" tile-layer="0">Bottom Layer</button></li>
-                    </ul>
-                </div> -->
                 <div>
                     <label>Level code:</label>
                     <input type="text" id="lvlcode" name="lvlcode" value="" readOnly="true"></input>

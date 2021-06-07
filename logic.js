@@ -1,6 +1,6 @@
 const pixLen = 32;
 
-var canvas = document.querySelector("canvas");
+var canvases = document.querySelectorAll("canvas")
 var cmbExample = document.getElementById("chosenExample");
 var tilesetContainer = document.querySelector(".tileset-container");
 var tilesetSelection = document.querySelector(".tileset-container_selection");
@@ -8,27 +8,26 @@ var tilesetImage = document.querySelector("#tileset-source");
 var txtResult = document.querySelector("#lvlcode")
 
 var selection = [0, 0]; //Which tile we will paint from the menu
-var startTile = [0, 5]; //Which menu tile represent the start point
 
 var isMouseDown = false;
-var currentLayer = 0;
+// var currentLayer = 0;
 var levelData = {
-    boardSize:[canvas.width / pixLen, canvas.height / pixLen],
+    boardSize:[mapCanvas.width / pixLen, mapCanvas.height / pixLen],
     start:[0, 0],
     tiles:[
-        //Bottom
+        //Map
         {
             //Structure is "x-y": ["tileset_x", "tileset_y"]
             //EXAMPLE: "1-1": [0, 4],
         },
-        //Middle
+        //Pool
         {},
-        //Top
+        //Starting
         {}
     ],
     speed:1,
     delay:3,
-    version:1, // to enable support for changes later
+    version:3, // to enable support for changes later
 };
 
 //Select tile from the Tiles grid
@@ -39,8 +38,8 @@ tilesetContainer.addEventListener("mousedown", (event) => {
 });
 
 //Handler for placing new tiles on the map
-function addTile(mouseEvent) {
-    const clicked = getCoords(event);
+function addTile(mouseEvent, currentLayer) {
+    const clicked = getCoords(mouseEvent);
 
     if (mouseEvent.shiftKey) {
         if(clicked[0] !== levelData.start[0] || clicked[1] !== levelData.start[1])
@@ -64,21 +63,24 @@ function toKey(pos) {
 }
 
 //Bind mouse events for painting (or removing) tiles on click/drag
-canvas.addEventListener("mousedown", () => {
-    isMouseDown = true;
-});
-canvas.addEventListener("mouseup", () => {
-    isMouseDown = false;
-});
-canvas.addEventListener("mouseleave", () => {
-    isMouseDown = false;
-});
-canvas.addEventListener("mousedown", addTile);
-canvas.addEventListener("mousemove", (event) => {
-    if (isMouseDown) {
-        addTile(event);
-    }
-});
+for (let i = 0; i < canvases.length; i++) {
+    let canvas = canvases[i];
+    canvas.addEventListener("mousedown", () => {
+        isMouseDown = true;
+    });
+    canvas.addEventListener("mouseup", () => {
+        isMouseDown = false;
+    });
+    canvas.addEventListener("mouseleave", () => {
+        isMouseDown = false;
+    });
+    canvas.addEventListener("mousedown", event => addTile(event, i));
+    canvas.addEventListener("mousemove", (event) => {
+        if (isMouseDown) {
+            addTile(event, i);
+        }
+    });
+}
 
 //Utility for getting coordinates of mouse click
 function getCoords(e) {
@@ -91,7 +93,8 @@ function getCoords(e) {
 //Reset state to empty
 function setCanvas() {
     if (cmbExample.value === "none") {
-        levelData = {"boardSize":[15,15],"start":[7,9],"tiles":[{"7-9":[0,0],"5-7":[3,3]},{},{}],"speed":1,"delay":3,"version":1};
+        levelData = {"boardSize":[15,15],"start":[7,9],"tiles":[{"7-9":[0,0],"5-7":[3,3]},{"0-0":[0,1],"1-0":[1,1],"2-0":[2,1],"3-0":[3,1],"4-0":[1,2],"5-0":[0,2],"6-0":[2,2]},{"0-0":[0,2],"1-0":[0,1],"2-0":[1,2]}],"speed":1,"delay":3,"version":3}
+        // levelData = {"boardSize":[15,15],"start":[7,9],"tiles":[{"7-9":[0,0],"5-7":[3,3]},{},{}],"speed":1,"delay":3,"version":1};
     } else if  (cmbExample.value === "exm1") {
         levelData = {"boardSize":[15,15],"start":[9,8],"tiles":[{"7-10":[2,3],"7-9":[0,2],"7-8":[0,2],"7-7":[0,2],"7-6":[3,5],"7-5":[0,1],"6-5":[2,5],"5-5":[1,2],"4-5":[3,1],"4-6":[1,1],"3-6":[1,2],"2-6":[2,2],"1-6":[2,1],"2-5":[0,1],"1-5":[3,1],"2-7":[0,2],"2-8":[0,2],"2-9":[0,2],"2-10":[0,2],"2-11":[1,1],"1-11":[3,3],"6-2":[0,3],"6-3":[0,2],"6-4":[0,2],"11-6":[1,3],"10-6":[1,2],"9-6":[1,2],"8-6":[1,2],"9-8":[1,0],"3-2":[2,3]},{},{}],"speed":1,"delay":3,"version":1};
     } else if  (cmbExample.value === "exm2") {
@@ -102,25 +105,16 @@ function setCanvas() {
     draw();
 }
 
-function setLayer(newLayer) {
-    //Update the layer
-    currentLayer = newLayer;
-
-    //Update the UI to show updated layer
-    var oldActiveLayer = document.querySelector(".layer.active");
-    if (oldActiveLayer) {
-        oldActiveLayer.classList.remove("active");
-    }
-    // document.querySelector(`[tile-layer="${currentLayer}"]`).classList.add("active");
-}
-
 function draw() {
-    var ctx = canvas.getContext("2d");
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    var size_of_crop = pixLen;
-
-    levelData.tiles.forEach((layer) => {
+    for (let i = 0; i < canvases.length; i++) {
+        let canvas = canvases[i];
+        let layer = levelData.tiles[i];
+        var ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+        var size_of_crop = pixLen;
+        
         Object.keys(layer).forEach((key) => {
             //Determine x/y position of this placement from key ("3-4" -> x=3, y=4)
             var positionX = Number(key.split("-")[0]);
@@ -139,15 +133,14 @@ function draw() {
                 size_of_crop
             );
         });
-    });
+    }
 
-    txtResult.value = JSON.stringify(levelData)
+    txtResult.value = JSON.stringify(levelData);
 }
 
 //Initialize app when tileset source is done loading
 tilesetImage.onload = function() {
     setCanvas();
-    setLayer(0);
 }
 tilesetImage.src = "./pipesWhiteSmall.png";
 
